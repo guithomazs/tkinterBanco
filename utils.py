@@ -26,6 +26,30 @@ class ScrollableFrame(tk.Frame):
 
     def _on_mousewheel(self, event):
         self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+class GridScrollableFrame(tk.Frame):
+    def __init__(self, container, *args, **kwargs):
+        super().__init__(container, *args, **kwargs)
+        self.canvas = tk.Canvas(self)
+        scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = tk.Frame(self.canvas)
+
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(
+                scrollregion=self.canvas.bbox("all")
+            )
+        )
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+
+        self.canvas.grid(side="left", fill="both", expand=True)
+        scrollbar.grid(side="right", fill="y")
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
 class DateEntry(tk.Entry):
     def __init__(self, master, *args, **kwargs):
@@ -36,7 +60,7 @@ class DateEntry(tk.Entry):
         self.ent = tk.Entry(self)
         self.ent.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
         self.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
-        self.pack()
+        self.grid()
     
     def onlyDigit(self, string):
         subs = sub('[^0-9]', '', string)
@@ -65,7 +89,7 @@ class CpfEntry(tk.Entry):
         self.ent = tk.Entry(self)
         self.ent.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
         self.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
-        self.pack()
+        self.grid()
     
     def onlyDigit(self, string):
         subs = sub('[^0-9]', '', string)
@@ -95,7 +119,7 @@ class PhoneEntry(tk.Entry):
         self.ent = tk.Entry(self)
         self.ent.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
         self.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
-        self.pack()
+        self.grid()
     
     def onlyDigit(self, string):
         subs = sub('[^0-9]', '', string)
@@ -107,12 +131,14 @@ class PhoneEntry(tk.Entry):
         size_after = len(String_after)
         size_before = len(String_before)
         if (self.onlyDigit(String_after) or String_after=="" or String_after=="(") and size_after <= 15:
-            if (size_after == 1 or size_after == 3 or size_after == 10) and d == '-1' and (size_after > size_before or size_after < 2):
-                pos = 0 if size_after == 1 else tk.END
-                if size_after == 1: char = '(' 
-                elif size_after == 3: char = ') ' 
-                else: char = '-' 
-                self.insertPos(pos, char)    
+            if (size_after == 1 or size_after == 3 or size_after == 10) \
+                and d == '-1' \
+                and (size_after > size_before or size_after < 2):
+                    pos = 0 if size_after == 1 else tk.END
+                    if size_after == 1: char = '(' 
+                    elif size_after == 3: char = ') ' 
+                    else: char = '-' 
+                    self.insertPos(pos, char)    
             return True
         else:
             return False
@@ -130,7 +156,7 @@ class CepEntry(tk.Entry):
         self.ent = tk.Entry(self)
         self.ent.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
         self.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
-        self.pack()
+        self.grid()
     
     def onlyDigit(self, string):
         subs = sub('[^0-9]', '', string)
@@ -153,12 +179,60 @@ class CepEntry(tk.Entry):
         self.insert(pos, char)
         return True  
     
-root = tk.Tk()
+# root = tk.Tk()
 
-scrollable = ScrollableFrame(root)
+# scrollable = ScrollableFrame(root)
 
-phone = PhoneEntry(scrollable).pack()
+# phone = PhoneEntry(scrollable).pack()
 
-scrollable.pack()
+# scrollable.pack()
 
-root.mainloop()
+# root.mainloop()
+
+
+class MaskedEntry(tk.Entry):
+    def __init__(self, master, mascara:str, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        mycmd = (self.register(self.valida), '%d', '%P', '%s')
+        self.mascara = mascara
+        # inval = self.register(self.invalido)  # -- não necessário criar uma de ivcmd
+        self.text = tk.StringVar()
+        self.ent = tk.Entry(self)
+        self.ent.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
+        self.configure(validate='key', validatecommand=mycmd, textvariable=self.text)
+        self.grid()
+    
+    def onlyDigit(self, string):
+        subs = sub('[^0-9]', '', string)
+        if str.isdigit(subs):
+            return True
+        return False
+
+    """
+    0 - Deleção
+    1 - Inserção
+    -1 - Mudança na StringVar
+    """
+    def valida(self, d, String_after, String_before):
+        print("AQUI:", d, String_after, String_before)
+        if d == "-1":
+            return False
+
+        new_result = ''
+        only_digits = ''.join([i for i in String_after if i in '1234567890'])
+        ipos = 0
+        for i in only_digits:
+            dig_mask = self.mascara[ipos]
+            if dig_mask not in '1234567980':
+                ipos += 1
+                new_result += dig_mask
+            new_result += i
+            ipos += 1
+        self.text.set(new_result)
+        # self.delete(0)
+        # self.insert(0, new_result)
+        return True
+            
+    def insertPos(self, pos, char):
+        self.insert(pos, char)
+        return True  

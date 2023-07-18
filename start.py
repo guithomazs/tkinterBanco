@@ -1,13 +1,15 @@
 from tkinter import *
 from PIL import Image, ImageTk
+import os 
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 background_color = '#1075a9'
 foreground_color = '#ddffaa'
 
 root = Tk()
-root.iconbitmap(\
-    'C:/Users/PC/Desktop/cdgs/Python/'\
-        'tesi/banco/bobAgiota.ico')
+iconpath = os.path.join(base_dir, 'bobAgiota.ico')
+root.iconbitmap(iconpath)
 root.geometry('500x400')
 root.title('Banquin do Bob')
 root.configure(bg=background_color)
@@ -15,10 +17,10 @@ root.configure(bg=background_color)
 class StartScreen(Frame):
     def __init__(self, master:Tk) -> None:    
         Frame.__init__(self, master)      
-
-        self.caminho_imagem = Image.open(\
-            'C:/Users/PC/Desktop/cdgs/Python/'\
-                'tesi/banco/bobAgiota.png')
+        import os 
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(base_dir, "bobAgiota.png")
+        self.caminho_imagem = Image.open(image_path)
 
         self.configure(bg=background_color)
 

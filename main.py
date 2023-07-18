@@ -1,21 +1,23 @@
 from tkinter import *
 from PIL import Image, ImageTk
-from start import EntrarFrame
+from start import StartScreen
+
+import os 
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 background_color = '#1075a9'
 foreground_color = '#ddffaa'
 
 janela = Tk()
-janela.iconbitmap(\
-    'C:/Users/PC/Desktop/cdgs/Python/'\
-        'tesi/banco/bobAgiota.ico')
+iconpath = os.path.join(base_dir, 'bobAgiota.ico')
+janela.iconbitmap(iconpath)
 janela.geometry('500x400')
 janela.title('Banquin do Bob')
 janela.configure(bg=background_color)
 
-caminho_imagem = Image.open(\
-    'C:/Users/PC/Desktop/cdgs/Python/'\
-        'tesi/banco/bobAgiota.png')
+image_path = os.path.join(base_dir, "bobAgiota.png")
+caminho_imagem = Image.open(image_path)
 
 imagem = ImageTk.PhotoImage(caminho_imagem.resize((180,180)))
 
@@ -58,7 +60,7 @@ def EntrarFrame(master:Tk):
         return frameCenter
 
 
-frame_start = EntrarFrame(janela)
-frame_start.place(in_=janela, anchor="c", relx=.5, rely=.5)
+# frame_start = StartScreen(janela)
+# frame_start.place(in_=janela, anchor="c", relx=.5, rely=.5)
 
 janela.mainloop()
