@@ -1,0 +1,22 @@
+informações pessoais
+- nome
+- cpf
+- documento de identidade
+- estado civil
+- sexo
+- email
+- celular (com ddd)
+
+informações de endereço
+- CEP
+- Rua
+- Número
+- Bairro
+- Complemento
+- Cidade
+- UF
+
+informações Financeiras
+- Profissão
+- Renda mensal
+- Patrimônio (Não colocado)
